@@ -46,3 +46,6 @@ sudo adduser jenkins sudo
 sudo cp -R /home/$USER/.ssh/ /home/jenkins/
 sudo passwd jenkins
 sudo su jenkins
+sudo chown -R jenkins:jenkins /home/jenkins/.ssh
+sudo chmod 700 /home/jenkins/.ssh
+sudo chmod 600 /home/jenkins/.ssh/known_hosts
