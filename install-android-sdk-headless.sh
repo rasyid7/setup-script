@@ -53,6 +53,7 @@ export PATH="$PATH:$SDK_ROOT/platform-tools:$SDK_ROOT/emulator:$SDK_ROOT/cmdline
 
 echo ">>> Accepting licenses and installing packages"
 yes | sdkmanager --licenses >/dev/null
+sdkmanager --sdk_root="$HOME/Android/sdk" "platform-tools" "emulator"
 sdkmanager --install "platform-tools" "emulator" "$PLATFORMS" "$BUILD_TOOLS" "$SYSTEM_IMAGE"
 
 echo ">>> Creating AVD: $AVD_NAME"
