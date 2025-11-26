@@ -84,3 +84,6 @@ echo
 echo "🔄 To apply changes immediately, run:"
 echo "   source $RC_FILE"
 echo
+echo "Please run this manually:"
+echo '   yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null'
+echo '   sdkmanager --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "emulator" "system-images;android-33;google_apis;x86_64"'
