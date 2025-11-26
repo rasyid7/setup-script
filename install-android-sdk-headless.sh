@@ -2,69 +2,85 @@
 set -euo pipefail
 
 # ===== Settings =====
+# Allow overriding SDK_ROOT via environment variable
 SDK_ROOT="${SDK_ROOT:-$HOME/Android/sdk}"
 JAVA_PKG="${JAVA_PKG:-openjdk-17-jdk-headless}"
 
-CMDLINE_TOOLS_ZIP="${CMDLINE_TOOLS_ZIP:-commandlinetools-linux-11076708_latest.zip}"
+# Check for updates here: https://developer.android.com/studio#command-tools
+CMDLINE_TOOLS_VER="11076708"
+CMDLINE_TOOLS_ZIP="commandlinetools-linux-${CMDLINE_TOOLS_VER}_latest.zip"
 CMDLINE_TOOLS_URL="https://dl.google.com/android/repository/${CMDLINE_TOOLS_ZIP}"
 
-PLATFORMS="${PLATFORMS:-platforms;android-34}"
-BUILD_TOOLS="${BUILD_TOOLS:-build-tools;34.0.0}"
-SYSTEM_IMAGE="${SYSTEM_IMAGE:-system-images;android-34;google_apis;x86_64}"
-AVD_NAME="${AVD_NAME:-pixel_6_api34}"
-DEVICE_NAME="${DEVICE_NAME:-pixel_6}"
+echo ">>> 📦 Settings:"
+echo "    SDK Location: $SDK_ROOT"
+echo "    Java Package: $JAVA_PKG"
+echo "    Tools Ver:    $CMDLINE_TOOLS_VER"
 
-echo ">>> Installing prerequisites"
-sudo apt update -y
-sudo apt install -y unzip curl ${JAVA_PKG} \
+echo ">>> 🛠️  Installing prerequisites..."
+# -qq suppresses output, useful for scripts
+sudo apt update -qq
+sudo apt install -y -qq unzip curl ${JAVA_PKG} \
   libc6 libstdc++6 lib32z1 libbz2-1.0 libglu1-mesa \
   libxi6 libxrender1 libxrandr2 libxcursor1 libxfixes3 \
   libdbus-1-3 libpulse0 libnss3 libxcomposite1 libxshmfence1 \
   mesa-vulkan-drivers
 
-echo ">>> Creating SDK root: $SDK_ROOT"
+echo ">>> 📂 Creating SDK root..."
 mkdir -p "$SDK_ROOT/cmdline-tools"
 
+# Create temp directory
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
+
+echo ">>> ⬇️  Downloading command line tools..."
 cd "$tmpdir"
-echo ">>> Downloading command line tools"
-curl -fL --retry 3 -o cmdtools.zip "$CMDLINE_TOOLS_URL"
+curl -fL --progress-bar --retry 3 -o cmdtools.zip "$CMDLINE_TOOLS_URL"
 unzip -q cmdtools.zip
 
-mkdir -p "$SDK_ROOT/cmdline-tools/latest"
-mv cmdline-tools/* "$SDK_ROOT/cmdline-tools/latest" || true
+# The zip extracts to a folder named 'cmdline-tools'. 
+# We need to move it to $SDK_ROOT/cmdline-tools/latest
+echo ">>> 🚚 Moving files to correct location..."
+rm -rf "$SDK_ROOT/cmdline-tools/latest"
+mv cmdline-tools "$SDK_ROOT/cmdline-tools/latest"
 
-echo ">>> Adding environment variables to ~/.bashrc"
-if ! grep -q "ANDROID_SDK_ROOT" "$HOME/.bashrc" ; then
-cat >> "$HOME/.bashrc" <<EOF
-
-# Android SDK
-export ANDROID_SDK_ROOT="$SDK_ROOT"
+# Setup environment variables for the current session
 export ANDROID_HOME="$SDK_ROOT"
-export PATH="\$PATH:$SDK_ROOT/platform-tools:$SDK_ROOT/emulator:$SDK_ROOT/cmdline-tools/latest/bin"
-EOF
-fi
-
-# Apply environment now
 export ANDROID_SDK_ROOT="$SDK_ROOT"
-export ANDROID_HOME="$SDK_ROOT"
-export PATH="$PATH:$SDK_ROOT/platform-tools:$SDK_ROOT/emulator:$SDK_ROOT/cmdline-tools/latest/bin"
+export PATH="$PATH:$SDK_ROOT/cmdline-tools/latest/bin:$SDK_ROOT/platform-tools:$SDK_ROOT/emulator"
 
-echo ">>> Accepting licenses and installing packages"
-yes | sdkmanager --licenses >/dev/null
-sdkmanager --sdk_root="$HOME/Android/sdk" "platform-tools" "emulator"
-sdkmanager --install "platform-tools" "emulator" "$PLATFORMS" "$BUILD_TOOLS" "$SYSTEM_IMAGE"
+echo ">>> 📜 Accepting licenses and installing packages..."
+# Combine installs into one step for speed. 
+# Explicitly use --sdk_root to prevent issues.
+yes | sdkmanager --sdk_root="$SDK_ROOT" --licenses >/dev/null
 
-echo ">>> Creating AVD: $AVD_NAME"
-yes | avdmanager create avd -n "$AVD_NAME" -k "$SYSTEM_IMAGE" --device "$DEVICE_NAME" || true
+echo ">>> 📥 Installing Platform Tools, Emulator, and System Images..."
+sdkmanager --sdk_root="$SDK_ROOT" \
+    "platform-tools" \
+    "emulator" \
+    "system-images;android-33;google_apis;x86_64"
+
+# Configuration for .bashrc
+RC_FILE="$HOME/.bashrc"
+echo ">>> 📝 configuring $RC_FILE..."
+
+# Helper function to append if not exists
+add_to_rc() {
+    local text="$1"
+    if ! grep -Fq "$text" "$RC_FILE"; then
+        echo "$text" >> "$RC_FILE"
+    fi
+}
+
+add_to_rc "# Android SDK Configuration"
+add_to_rc "export ANDROID_HOME=\"$SDK_ROOT\""
+add_to_rc "export ANDROID_SDK_ROOT=\"$SDK_ROOT\""
+# We use single quotes around $PATH to ensure it evaluates at runtime, not install time
+add_to_rc 'export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator"'
 
 echo
-echo "✅ Installation complete"
+echo "✅ Installation complete!"
+echo "   SDK installed at: $SDK_ROOT"
 echo
-echo "Reload your shell:"
-echo "  source ~/.bashrc"
-echo
-echo "Start emulator headless:"
-echo "  emulator -avd $AVD_NAME -no-window -gpu swiftshader_indirect -no-snapshot -noaudio"
+echo "🔄 To apply changes immediately, run:"
+echo "   source $RC_FILE"
 echo
