@@ -66,17 +66,6 @@ add_to_rc "export ANDROID_SDK_ROOT=\"$SDK_ROOT\""
 # We use single quotes around $PATH to ensure it evaluates at runtime, not install time
 add_to_rc 'export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator"'
 
-echo ">>> 📜 Accepting licenses and installing packages..."
-# Combine installs into one step for speed. 
-# Explicitly use --sdk_root to prevent issues.
-yes | sdkmanager --sdk_root="$SDK_ROOT" --licenses >/dev/null
-
-echo ">>> 📥 Installing Platform Tools, Emulator, and System Images..."
-sdkmanager --sdk_root="$SDK_ROOT" \
-    "platform-tools" \
-    "emulator" \
-    "system-images;android-33;google_apis;x86_64"
-
 echo
 echo "✅ Installation complete!"
 echo "   SDK installed at: $SDK_ROOT"
@@ -85,5 +74,5 @@ echo "🔄 To apply changes immediately, run:"
 echo "   source $RC_FILE"
 echo
 echo "Please run this manually:"
-echo '   yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null'
-echo '   sdkmanager --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "emulator" "system-images;android-33;google_apis;x86_64"'
+echo "   yes | sdkmanager --sdk_root='$ANDROID_SDK_ROOT' --licenses >/dev/null"
+echo "   sdkmanager --sdk_root='$ANDROID_SDK_ROOT' 'platform-tools' 'emulator' 'system-images;android-33;google_apis;x86_64'"
