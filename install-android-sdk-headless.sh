@@ -48,17 +48,6 @@ export ANDROID_HOME="$SDK_ROOT"
 export ANDROID_SDK_ROOT="$SDK_ROOT"
 export PATH="$PATH:$SDK_ROOT/cmdline-tools/latest/bin:$SDK_ROOT/platform-tools:$SDK_ROOT/emulator"
 
-echo ">>> 📜 Accepting licenses and installing packages..."
-# Combine installs into one step for speed. 
-# Explicitly use --sdk_root to prevent issues.
-yes | sdkmanager --sdk_root="$SDK_ROOT" --licenses >/dev/null
-
-echo ">>> 📥 Installing Platform Tools, Emulator, and System Images..."
-sdkmanager --sdk_root="$SDK_ROOT" \
-    "platform-tools" \
-    "emulator" \
-    "system-images;android-33;google_apis;x86_64"
-
 # Configuration for .bashrc
 RC_FILE="$HOME/.bashrc"
 echo ">>> 📝 configuring $RC_FILE..."
@@ -76,6 +65,17 @@ add_to_rc "export ANDROID_HOME=\"$SDK_ROOT\""
 add_to_rc "export ANDROID_SDK_ROOT=\"$SDK_ROOT\""
 # We use single quotes around $PATH to ensure it evaluates at runtime, not install time
 add_to_rc 'export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator"'
+
+echo ">>> 📜 Accepting licenses and installing packages..."
+# Combine installs into one step for speed. 
+# Explicitly use --sdk_root to prevent issues.
+yes | sdkmanager --sdk_root="$SDK_ROOT" --licenses >/dev/null
+
+echo ">>> 📥 Installing Platform Tools, Emulator, and System Images..."
+sdkmanager --sdk_root="$SDK_ROOT" \
+    "platform-tools" \
+    "emulator" \
+    "system-images;android-33;google_apis;x86_64"
 
 echo
 echo "✅ Installation complete!"
