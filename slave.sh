@@ -49,3 +49,10 @@ sudo su jenkins
 sudo chown -R jenkins:jenkins /home/jenkins/.ssh
 sudo chmod 700 /home/jenkins/.ssh
 sudo chmod 600 /home/jenkins/.ssh/known_hosts
+
+# Install Docker
+# https://gitlab.com/bmcgonag/docker_installs
+# wget https://raw.githubusercontent.com/bmcgonag/docker_installs/main/install_docker_nproxyman.sh 
+wget https://gitlab.com/bmcgonag/docker_installs/-/raw/main/install_docker_nproxyman.sh 
+chmod +x install_docker_nproxyman.sh
+./install_docker_nproxyman.sh
