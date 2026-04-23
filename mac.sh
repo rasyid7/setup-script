@@ -53,6 +53,8 @@ defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock tilesize -int 53
 killall Dock
 
+# softwareupdate --install-rosetta
+# brew install --cask docker-desktop
 # brew install --cask logi-options+
 # brew install --cask tunnelblick
 
