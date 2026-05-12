@@ -23,6 +23,8 @@ brew install --cask aldente
 
 brew install openjdk@21
 
+brew install yarn
+
 brew install --cask rectangle
 
 brew install maccy
