@@ -25,6 +25,8 @@ brew install openjdk@21
 
 brew install yarn
 
+brew install spinningarrow/tap/git-pair
+
 brew install --cask rectangle
 
 brew install maccy
