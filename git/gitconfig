@@ -1,0 +1,9 @@
+[user]
+    name = Rasyid Ridho
+    email = rasyidridho7@gmail.com
+
+[includeIf "gitdir:~/Workspace/"]
+    path = ~/.gitconfig-work
+
+[includeIf "gitdir:~/{Learning,Projects}/"]
+    path = ~/.gitconfig-personal
