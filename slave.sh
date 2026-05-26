@@ -5,14 +5,11 @@ sudo apt update
 sudo apt upgrade -y
 # java
 sudo apt install -y openjdk-17-jdk
-# update java
-# sudo apt install openjdk-17-jdk
-# sudo update-alternatives --config java
 # python-pip
 sudo apt install -y python3-pip
 # nvm
 curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-nvm install 18
+nvm install 24
 # google-chrome
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt --fix-broken install -y ./google-chrome-stable_current_amd64.deb
