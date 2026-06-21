@@ -3,6 +3,7 @@
 # general
 sudo apt update
 sudo apt upgrade -y
+sudo apt install git wget vim curl
 # java
 sudo apt install -y openjdk-17-jdk
 # python-pip
